@@ -1,0 +1,8 @@
+[{'bus': 1, 'car': 1, 'frame_num': 10},
+ {'car': 3, 'frame_num': 20},
+ {'car': 4, 'frame_num': 30},
+ {'car': 2, 'frame_num': 40},
+ {'car': 3, 'frame_num': 50},
+ {'car': 3, 'frame_num': 60},
+ {'car': 2, 'frame_num': 70},
+ {'car': 3, 'frame_num': 80}]

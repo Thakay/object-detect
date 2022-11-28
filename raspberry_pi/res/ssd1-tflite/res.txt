@@ -1,0 +1,7 @@
+[{'frame_num': 10, 'person': 1, 'traffic light': 1, 'train': 1},
+ {'car': 1, 'frame_num': 20, 'traffic light': 1},
+ {'car': 1, 'frame_num': 30},
+ {'car': 1, 'frame_num': 40, 'train': 1},
+ {'car': 2, 'frame_num': 50, 'truck': 1},
+ {'car': 5, 'frame_num': 60},
+ {'car': 5, 'frame_num': 70}]
