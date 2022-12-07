@@ -52,10 +52,6 @@ def main():
 
     print('Loading {} with {} labels.'.format(args.model, args.labels))
     vidname = args.file
-    #video = cv2.VideoCapture('daylow.mp4')
-    #video = cv2.VideoCapture('car2.mp4')
-    #video = cv2.VideoCapture('lownight.mp4')
-    #video = cv2.VideoCapture('night2.mp4')
     video = cv2.VideoCapture(vidname)
     #cap = cv2.VideoCapture(args.camera_idx)
     imW = video.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -75,10 +71,14 @@ def main():
     vidname = args.file.split('.')[0]
     if not os.path.exists(f'./res/{vidname}'):
       os.mkdir(f'./res/{vidname}')
-    
-    frameSize = (500, 500)
 
-    out = cv2.VideoWriter('output_video.avi',cv2.VideoWriter_fourcc(*'DIVX'), 60, frameSize)
+    scale_percent = 32 # percent of original size
+    width_ = int(video.get(3) * scale_percent / 100)
+    height_ = int(video.get(4) * scale_percent / 100)
+    frameSize = (width_,height_)
+    
+    fps_rate = 10
+    out = cv2.VideoWriter(f'{vidname}_{frameSize}_{fps_rate}fps.avi',cv2.VideoWriter_fourcc('M','J','P','G'), fps_rate , frameSize)
     while video.isOpened():
         
         ret, frame = video.read()
@@ -92,17 +92,19 @@ def main():
           end_time = time.time()
           fps = fps_avg_frame_count / (end_time - start_time)
           start_time = time.time()
-
-        # Show the FPS
-        fps_text = 'FPS = {:.1f}'.format(fps)
-        text_location = (left_margin, row_size)
-        cv2.putText(cv2_im, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
-                    font_size, text_color, font_thickness)
+                   
         if counter % 10 == 0:
             
             filename  = f'./res/{vidname}/frame{counter}.jpg'
-            out.write(cv2_im)
-            cv2.imwrite(filename, cv2_im)
+
+            scale_percent = 60 # percent of original size
+            width_ = int(cv2_im.shape[1] * scale_percent / 100)
+            height_ = int(cv2_im.shape[0] * scale_percent / 100)
+            dim = (width_, height_)
+            resized = cv2.resize(cv2_im, dim, interpolation = cv2.INTER_AREA)
+
+            out.write(resized)
+            # cv2.imwrite(filename, cv2_im)
         
         
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -110,8 +112,10 @@ def main():
     
     # with open(f'./res/{checkname}{vidname}/res.txt','w') as f:
     #   f.write(pprint.pformat(data))
+    print(resized.shape)
+    print(cv2_im.shape)
     print(counter)
-    pprint.pprint(data)
+    # pprint.pprint(data)
     video.release()
     cv2.destroyAllWindows()
 
