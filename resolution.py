@@ -78,7 +78,7 @@ def main():
     frameSize = (width_,height_)
     
     fps_rate = 10
-    out = cv2.VideoWriter(f'{vidname}_{frameSize}_{fps_rate}fps.avi',cv2.VideoWriter_fourcc('M','J','P','G'), fps_rate , frameSize)
+    out = cv2.VideoWriter(f'./res/{vidname}_{frameSize}_{fps_rate}fps.avi',cv2.VideoWriter_fourcc('M','J','P','G'), fps_rate , frameSize)
     while video.isOpened():
         
         ret, frame = video.read()
@@ -97,7 +97,6 @@ def main():
             
             filename  = f'./res/{vidname}/frame{counter}.jpg'
 
-            scale_percent = 60 # percent of original size
             width_ = int(cv2_im.shape[1] * scale_percent / 100)
             height_ = int(cv2_im.shape[0] * scale_percent / 100)
             dim = (width_, height_)
