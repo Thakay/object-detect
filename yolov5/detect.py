@@ -242,7 +242,12 @@ def run(
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")
     if update:
         strip_optimizer(weights[0])  # update model (to fix SourceChangeWarning)
-
+    with open(f"./runs/results_{source.split('/')[-1]}.csv","w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["frameID","name","xmin","ymin","xmax","ymax"])
+        for i in results:
+            for j in results[i]:
+                writer.writerow([i,*j])
 
 def parse_opt():
     parser = argparse.ArgumentParser()
