@@ -143,7 +143,7 @@ def run(
 
         # Process predictions
         for i, det in enumerate(pred):  # per image
-            results.setdefault(counter,[])
+            results.setdefault(counter + 1,[])
             seen += 1
             if webcam:  # batch_size >= 1
                 p, im0, frame = path[i], im0s[i].copy(), dataset.count
@@ -171,7 +171,7 @@ def run(
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
                     
-                    results[counter].append([names[int(cls)], *[int(cord) for cord in xyxy]])
+                    results[counter+1].append([names[int(cls)], *[int(cord) for cord in xyxy]])
                     if save_txt:  # Write to file
                         xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                         line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
@@ -187,8 +187,12 @@ def run(
 
             # Stream results
             im0 = annotator.result()
+            counter += 1
+            if counter % 10 == 0:
+                    filename  = f'./runs/fr{source.split("/")[-1]}/frame{counter}.jpg'
+                    cv2.imwrite(filename, im0)
             if view_img:
-                counter += 1
+                
                 # Calculate the FPS
                 if counter % fps_avg_frame_count == 0:
                   end_time = time.time()
@@ -205,9 +209,7 @@ def run(
                 text_location = (left_margin, row_size)
                 cv2.putText(im0, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
                             font_size, text_color, font_thickness)
-                if counter % 10 == 0:
-                    filename  = f'./runs/fr2/frame{counter}.jpg'
-                    cv2.imwrite(filename, im0)
+                
                 cv2.imshow(str(p), im0)
                 cv2.waitKey(1)  # 1 millisecond
 
@@ -236,7 +238,7 @@ def run(
     # Print results
     t = tuple(x.t / seen * 1E3 for x in dt)  # speeds per image
     LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {(1, 3, *imgsz)}' % t)
-    pprint.pprint(results)
+    # pprint.pprint(results)
     if save_txt or save_img:
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")
