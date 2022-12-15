@@ -23,7 +23,8 @@ Usage - formats:
                                  yolov5s.tflite             # TensorFlow Lite
                                  yolov5s_edgetpu.tflite     # TensorFlow Edge TPU
 """
-
+import pprint
+import csv
 import argparse
 import os
 import platform
@@ -118,7 +119,7 @@ def run(
     fps_avg_frame_count = 10
     counter, fps = 0, 0
     start_time = time.time()
-    
+    results = {}
     for path, im, im0s, vid_cap, s in dataset:
         with dt[0]:
             im = torch.from_numpy(im).to(device)
@@ -131,6 +132,7 @@ def run(
         with dt[1]:
             visualize = increment_path(save_dir / Path(path).stem, mkdir=True) if visualize else False
             pred = model(im, augment=augment, visualize=visualize)
+            
 
         # NMS
         with dt[2]:
@@ -141,6 +143,7 @@ def run(
 
         # Process predictions
         for i, det in enumerate(pred):  # per image
+            results.setdefault(counter,[])
             seen += 1
             if webcam:  # batch_size >= 1
                 p, im0, frame = path[i], im0s[i].copy(), dataset.count
@@ -157,6 +160,7 @@ def run(
             annotator = Annotator(im0, line_width=line_thickness, example=str(names))
             if len(det):
                 # Rescale boxes from img_size to im0 size
+                
                 det[:, :4] = scale_coords(im.shape[2:], det[:, :4], im0.shape).round()
 
                 # Print results
@@ -166,6 +170,8 @@ def run(
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
+                    
+                    results[counter].append([names[int(cls)], *[int(cord) for cord in xyxy]])
                     if save_txt:  # Write to file
                         xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                         line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
@@ -230,6 +236,7 @@ def run(
     # Print results
     t = tuple(x.t / seen * 1E3 for x in dt)  # speeds per image
     LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {(1, 3, *imgsz)}' % t)
+    pprint.pprint(results)
     if save_txt or save_img:
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")

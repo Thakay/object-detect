@@ -1,0 +1,5 @@
+frameID,name,xmin,ymin,xmax,ymax
+1,car,1,2,3,4
+1,bloom,11,2,3,22
+2,mouse,1,2,3,4
+2,vie,11,2,3,22
