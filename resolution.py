@@ -68,7 +68,7 @@ def main():
     start_time = time.time()
     data = []
     checkname = "test"
-    vidname = args.file.split('.')[0]
+    vidname = args.file.split('/')[-1].split('.')[0]
     if not os.path.exists(f'./res/{vidname}'):
       os.mkdir(f'./res/{vidname}')
 
@@ -77,7 +77,7 @@ def main():
     height_ = int(video.get(4) * scale_percent / 100)
     frameSize = (width_,height_)
     
-    fps_rate = 10
+    fps_rate = 20
     out = cv2.VideoWriter(f'./res/{vidname}_{frameSize}_{fps_rate}fps.avi',cv2.VideoWriter_fourcc('M','J','P','G'), fps_rate , frameSize)
     while video.isOpened():
         
@@ -93,7 +93,7 @@ def main():
           fps = fps_avg_frame_count / (end_time - start_time)
           start_time = time.time()
                    
-        if counter % 10 == 0:
+        if counter % 20 == 0:
             
             filename  = f'./res/{vidname}/frame{counter}.jpg'
 

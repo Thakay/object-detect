@@ -189,7 +189,7 @@ def run(
             im0 = annotator.result()
             counter += 1
             if counter % 10 == 0:
-                    filename  = f'./runs/fr{source.split("/")[-1]}/frame{counter}.jpg'
+                    filename  = f'./runs/fr1/{source.split("/")[-1]}_frame{counter}.jpg'
                     cv2.imwrite(filename, im0)
             if view_img:
                 
