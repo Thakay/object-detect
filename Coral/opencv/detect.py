@@ -47,7 +47,7 @@ def main():
                         default=os.path.join(default_model_dir,default_model))
     parser.add_argument('--labels', help='label file path',
                         default=os.path.join(default_model_dir, default_labels))
-    parser.add_argument('--top_k', type=int, default=8,
+    parser.add_argument('--top_k', type=int, default=4,
                         help='number of categories with highest score to display')
     parser.add_argument('--camera_idx', type=int, help='Index of which video source to use. ', default = 0)
     parser.add_argument('--threshold', type=float, default=0.1,
@@ -131,7 +131,8 @@ def main():
         #cv2.imshow('frame', cv2_im)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-    
+    print(vidname.split('/'))
+    print(vidname)
 
     with open(f"./res/results_{vidname.split('/')[-1]}.csv","w", newline="") as file:
         writer = csv.writer(file)
