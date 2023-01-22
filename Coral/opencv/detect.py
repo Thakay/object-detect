@@ -133,7 +133,7 @@ def main():
             break
     
 
-    with open(f"./runs/results_{vidname.split('/')[-1]}.csv","w", newline="") as file:
+    with open(f"./res/results_{vidname.split('/')[-1]}.csv","w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(["frameID","name","xmin","ymin","xmax","ymax"])
         for i in results:
