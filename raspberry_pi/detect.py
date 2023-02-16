@@ -22,6 +22,8 @@ from tflite_support.task import core
 from tflite_support.task import processor
 from tflite_support.task import vision
 import utils
+from pyembedded.raspberry_pi_tools.raspberrypi import PI
+import csv
 
 
 def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
@@ -40,7 +42,7 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
   # Variables to calculate FPS
   counter, fps = 0, 0
   start_time = time.time()
-  
+  pi = PI()
   # Open video file
   #video = cv2.VideoCapture('car2.mp4')
   #video = cv2.VideoCapture('daylow.mp4')
@@ -78,65 +80,72 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
   checkname = modelname = model.replace('.','-')
   if not os.path.exists(f'./res/{checkname}'):
       os.mkdir(f'./res/{checkname}')
-  while video.isOpened():
-    success, image = video.read()
-    if not success:
-      break
-      #sys.exit(
-       #   'ERROR: Unable to read from webcam. Please verify your webcam settings.'
-      #)
+  with open('usage.csv', 'a', newline='') as file:
+    writer = csv.writer(file)
 
-    counter += 1
-    
-    #image = cv2.flip(image, 1)
+    writer.writerow(["ram_used","ram_ava", "cpu", "temp"])
+            
+    while video.isOpened():
+        ram = pi.get_ram_info()
+        writer.writerow([ram[1],ram[2], pi.get_cpu_usage(), pi.get_cpu_temp()])
+        success, image = video.read()
+        if not success:
+            break
+        #sys.exit(
+        #   'ERROR: Unable to read from webcam. Please verify your webcam settings.'
+        #)
 
-    # Convert the image from BGR to RGB as required by the TFLite model.
-    rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        counter += 1
+        
+        #image = cv2.flip(image, 1)
 
-    # Create a TensorImage object from the RGB image.
-    input_tensor = vision.TensorImage.create_from_array(rgb_image)
+        # Convert the image from BGR to RGB as required by the TFLite model.
+        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    # Run object detection estimation using the model.
-    detection_result = detector.detect(input_tensor)
-    
-    # Draw keypoints and edges on input image
-    image = utils.visualize(image, detection_result)
-    
-    # Calculate the FPS
-    if counter % fps_avg_frame_count == 0:
-      end_time = time.time()
-      fps = fps_avg_frame_count / (end_time - start_time)
-      start_time = time.time()
+        # Create a TensorImage object from the RGB image.
+        input_tensor = vision.TensorImage.create_from_array(rgb_image)
 
-    # Show the FPS
-    fps_text = 'FPS = {:.1f}'.format(fps)
-    text_location = (left_margin, row_size)
-    cv2.putText(image, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
-                font_size, text_color, font_thickness)
+        # Run object detection estimation using the model.
+        detection_result = detector.detect(input_tensor)
+        
+        # Draw keypoints and edges on input image
+        image = utils.visualize(image, detection_result)
+        
+        # Calculate the FPS
+        if counter % fps_avg_frame_count == 0:
+            end_time = time.time()
+            fps = fps_avg_frame_count / (end_time - start_time)
+            start_time = time.time()
 
-    # Stop the program if the ESC key is pressed.
-    
-    if counter % 10 == 0:
-        modelname = model.replace('.','-')
-        filename  = f'./res/{modelname}/frame{counter}.jpg'
-        cv2.imwrite(filename, image)
-        aux_data = {}
-        for cnt,det in enumerate(detection_result.detections):
-            cat = det.categories[0]
-            cat_name = cat.category_name
-            prob = round(cat.score, 2)
-            aux_data['frame_num'] = counter
-            aux_data.setdefault(cat_name,0)
-            aux_data[cat_name] += 1
-        data.append(aux_data)
-    
-    if cv2.waitKey(1) == 27:
-      break
-    cv2.imshow('object_detector', image)
-  with open(f'./res/{checkname}/res{num_threads}.txt','w') as f:
-      f.write(pprint.pformat(data))
-  pprint.pprint(data)
-  print(int(video.get(cv2.CAP_PROP_FRAME_COUNT)))
+        # Show the FPS
+        fps_text = 'FPS = {:.1f}'.format(fps)
+        text_location = (left_margin, row_size)
+        cv2.putText(image, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
+                    font_size, text_color, font_thickness)
+
+        # Stop the program if the ESC key is pressed.
+        
+        # if counter % 10 == 0:
+        #     modelname = model.replace('.','-')
+        #     filename  = f'./res/{modelname}/frame{counter}.jpg'
+        #     cv2.imwrite(filename, image)
+        #     aux_data = {}
+        #     for cnt,det in enumerate(detection_result.detections):
+        #         cat = det.categories[0]
+        #         cat_name = cat.category_name
+        #         prob = round(cat.score, 2)
+        #         aux_data['frame_num'] = counter
+        #         aux_data.setdefault(cat_name,0)
+        #         aux_data[cat_name] += 1
+        #     data.append(aux_data)
+        
+        if cv2.waitKey(1) == 27:
+            break
+        cv2.imshow('object_detector', image)
+#   with open(f'./res/{checkname}/res{num_threads}.txt','w') as f:
+#       f.write(pprint.pformat(data))
+#   pprint.pprint(data)
+#   print(int(video.get(cv2.CAP_PROP_FRAME_COUNT)))
   
   video.release()
   cv2.destroyAllWindows()
