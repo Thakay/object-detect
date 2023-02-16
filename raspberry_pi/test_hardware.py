@@ -10,5 +10,6 @@ pi.get_cpu_temp()
 with open('usage.csv', 'w', newline='') as file:
      writer = csv.writer(file)
 
-     writer.writerow(["ram", "cpu", "temp"])
-     writer.writerow([pi.get_ram_info(), pi.get_cpu_usage(), pi.get_cpu_temp()])
+     writer.writerow(["ram_used","ram_ava", "cpu", "temp"])
+     ram = pi.get_ram_info()
+     writer.writerow([ram[1],ram[2], pi.get_cpu_usage(), pi.get_cpu_temp()])
