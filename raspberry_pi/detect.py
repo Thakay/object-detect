@@ -45,7 +45,7 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
   #video = cv2.VideoCapture('car2.mp4')
   #video = cv2.VideoCapture('daylow.mp4')
   #video = cv2.VideoCapture('lownight.mp4')
-  video = cv2.VideoCapture('night2.mp4')
+  video = cv2.VideoCapture('h.avi')
   #video = cv2.VideoCapture('test.mp4')
   imW = video.get(cv2.CAP_PROP_FRAME_WIDTH)
   imH = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
