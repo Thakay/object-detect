@@ -134,7 +134,7 @@ def main():
             #         aux_data[cat_name] += 1
             #     data.append(aux_data)
             
-            #cv2.imshow('frame', cv2_im)
+            cv2.imshow('frame', cv2_im)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         
