@@ -48,6 +48,9 @@ from utils.general import (LOGGER, Profile, check_file, check_img_size, check_im
 from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, smart_inference_mode
 
+from pyembedded.raspberry_pi_tools.raspberrypi import PI
+import csv
+
 
 @smart_inference_mode()
 def run(
@@ -187,10 +190,14 @@ def run(
 
             # Stream results
             im0 = annotator.result()
-            counter += 1
-            if counter % 10 == 0:
-                    filename  = f'./runs/fr1/{source.split("/")[-1]}_frame{counter}.jpg'
-                    cv2.imwrite(filename, im0)
+            # counter += 1
+            # if counter % 10 == 0:
+            #         filename  = f'./runs/fr1/{source.split("/")[-1]}_frame{counter}.jpg'
+            #         cv2.imwrite(filename, im0)
+            with open('usage_yolo.csv', 'a', newline='') as file:
+                writer = csv.writer(file)
+
+                writer.writerow(["ram_used","ram_ava", "cpu", "temp"])
             if view_img:
                 
                 # Calculate the FPS
